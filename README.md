@@ -63,7 +63,7 @@ async def task_2(n=1):
 ```
 
 ```
-# callback func
+# Callback func
 def callback(future, arg=None):
     '''
     At least ONE Parameter "future" is required.
