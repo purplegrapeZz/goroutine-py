@@ -46,7 +46,7 @@ import time
 from goroutine.app import go
 
 # 普通函数
-def task_1(n):
+def task_1(n=2):
     time.sleep(n)
     print('Task_1_done')
     return 'Result_1'
@@ -54,7 +54,7 @@ def task_1(n):
 
 ```
 # 协程函数
-async def task_2(n):
+async def task_2(n=1):
     await asyncio.sleep(n)
     print('Task_2_done')
     return 'Result_2'
