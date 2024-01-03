@@ -25,8 +25,10 @@ def callback(future, arg=None):
     '''
     print(future.result(),arg)
 
-go(task_1)
-go(task_2)
-go(task_1, 4, callback=callback)
-go(task_2, 3, callback=functools.partial(callback,arg='a'))
-print('END')
+
+if __name__ == '__main__':
+    go(task_1)
+    go(task_2)
+    go(task_1, 4, callback=callback)
+    go(task_2, 3, callback=functools.partial(callback,arg='a'))
+    print('END')
