@@ -29,7 +29,6 @@ Main function ___go___ :
 # Getting Started
 
 ## Support
-
 ​	Python3.7	Python3.8	Python3.9	Python3.10
 
 ## Installation
