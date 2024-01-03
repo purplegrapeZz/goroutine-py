@@ -6,6 +6,8 @@ English | [中文](https://github.com/purplegrapeZz/goroutine-py/blob/master/REA
 
 ​	Easy concurrency just like goroutine without worry about thread and coroutine in Python.
 
+
+
 # Introduction
 
 Withing  ``goroutine.app.go`` you can run a coroutine or a func asynchronously.
@@ -25,6 +27,10 @@ Main function ___go___ :
 ​		 This argument only work for "func" not "coroutinefunction".
 
 # Getting Started
+
+## Support:
+
+​	Python3.7	Python3.8	Python3.9	Python3.10
 
 ## Installation
 
