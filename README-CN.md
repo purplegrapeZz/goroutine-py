@@ -23,7 +23,7 @@
 ​	___lock:___ 线程安全参数, 只在线程(传入普通函数)中有效.
 
 # 开始
-## Support:
+## 支持:
 
 	Python3.7	Python3.8	Python3.9	Python3.10
 
