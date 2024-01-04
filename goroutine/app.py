@@ -10,8 +10,7 @@ __author__ = 'ZIHAN MA (xudesoft@126.com)'
 import asyncio
 from threading import Thread
 import functools
-from concurrent.futures import Future
-from asyncio import coroutine
+from asyncio.futures import Future
 
 
 def _run() -> None:
@@ -30,7 +29,7 @@ def _iscorfunc(obj: callable) -> bool:
     return asyncio.iscoroutinefunction(obj)
 
 
-async def _wrap_as_cor(obj: callable, *args) -> coroutine:
+async def _wrap_as_cor(obj: callable, *args) -> Future:
     '''
     Wrap a func as a coroutine.
     Return:
@@ -40,7 +39,7 @@ async def _wrap_as_cor(obj: callable, *args) -> coroutine:
     return res
 
 
-async def _wrap_as_cor_withlock(obj: callable, *args) -> coroutine:
+async def _wrap_as_cor_withlock(obj: callable, *args) -> Future:
     '''
     Wrap a func as a coroutine with lock. Means thread safe.
     Return:
