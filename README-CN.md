@@ -27,7 +27,7 @@
 # 开始
 ## 支持
 
-	Python3.7	Python3.8	Python3.9	Python3.10
+	Python 3.7 / 3.8 / 3.9 / 3.10 /3.11 / 3.12
 
 ## 安装
 
