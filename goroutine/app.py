@@ -121,7 +121,7 @@ def go(obj: callable, *args, callback: callable = None, lock: bool = False) -> N
 _goroutine_loop_lock = asyncio.Lock()
 
 # Getting loop.
-_goroutine_loop = asyncio.get_event_loop()
+_goroutine_loop = asyncio.new_event_loop()
 
 # Run the loop in a thread.
 T = Thread(target=_run, daemon=True)
