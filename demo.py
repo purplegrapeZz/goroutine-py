@@ -1,5 +1,4 @@
 import asyncio
-import functools
 import time
 from goroutine.app import go
 
@@ -16,19 +15,26 @@ async def task_2(n=1):
     print('Task_2_done')
     return 'Result_2'
 
-# callback func
-def callback(future, arg=None):
+# Callback func
+def callback(result):
     '''
-    At least ONE Parameter "future" is required.
-    This future is a concurrent.futures.Future.
-    Use functools.partial() to give arguments for your callback func.
+    Parameter "result" is the return from task.
+    Use functools.partial() to give arguments if you need more args at the beginning.
     '''
-    print(future.result(),arg)
+    print('-* callback *-')
+    print(result)
 
 
 if __name__ == '__main__':
     go(task_1)
     go(task_2)
-    go(task_1, 4, callback=callback)
-    go(task_2, 3, callback=functools.partial(callback,arg='a'))
+
+    # The "callback" parameter must be specified separately.
+    go(task_1, 5, callback = callback)
+    go(task_2, 3, callback = callback)
     print('END')
+
+    # Forever runing to show results.
+    while 1:
+        time.sleep(5)
+        
