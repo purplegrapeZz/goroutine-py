@@ -9,9 +9,7 @@ __author__ = 'ZIHAN MA (xudesoft@126.com)'
 
 import asyncio
 from threading import Thread
-import functools
-from asyncio.futures import Future
-
+from typing import Any
 
 def _run() -> None:
     '''
@@ -20,7 +18,7 @@ def _run() -> None:
     _goroutine_loop.run_forever()
 
 
-def _iscorfunc(obj: callable) -> bool:
+def _iscor(obj: callable) -> bool:
     '''
     Check if obj a coroutinefunction.
     Return:
@@ -29,52 +27,34 @@ def _iscorfunc(obj: callable) -> bool:
     return asyncio.iscoroutinefunction(obj)
 
 
-async def _wrap_as_cor(obj: callable, *args) -> Future:
+async def _wrap_cor(_cor, *args, callback = None) -> None:
     '''
-    Wrap a func as a coroutine.
+    Handle the obj.
+    And will put this wrapper to the loop.
     Return:
-        A coroutine.
+        None.
     '''
-    res = await asyncio.to_thread(obj, *args)
+    res = await _cor
+
+    # Handle the callback func from user.
+    if callable(callback):
+        if _iscor(callback):
+            await callback(res) if res else callback()
+        else:
+            await _wrap_func(callback, res) if res else _wrap_func(callback)
+
+
+async def _wrap_func(func: callable, *args) -> Any:
+    '''
+    For normal func, run as a thread.
+    Return:
+        Result of func.
+    '''
+    res = await asyncio.to_thread(func, *args)
     return res
 
 
-async def _wrap_as_cor_withlock(obj: callable, *args) -> Future:
-    '''
-    Wrap a func as a coroutine with lock. Means thread safe.
-    Return:
-        A coroutine.
-    '''
-    async with _goroutine_loop_lock:
-        res = await asyncio.to_thread(obj, *args)
-        return res
-
-
-def _wrap_as_func(obj: callable, future: Future) -> None:
-    '''
-    For callback func is given as a coroutine.
-    '''
-    asyncio.run_coroutine_threadsafe(obj(future), _goroutine_loop)
-
-
-def _finish(future: Future, callback: callable) -> None:
-    '''
-    Do the callback.
-    '''
-    if callable(callback):
-        if not _iscorfunc(callback):
-            # Check if callback a func.
-            future.add_done_callback(callback)
-        else:
-            future.add_done_callback(
-                functools.partial(
-                    _wrap_as_func, callback))
-    else:
-        raise TypeError(
-            'A callable func or coroutinefunction object is required for callback.')
-
-
-def go(obj: callable, *args, callback: callable = None, lock: bool = False) -> None:
+def go(obj: callable, *args, callback: callable = None) -> None:
     '''
     Run a coroutine or a func asynchronously.
     Easy concurrency in Python.
@@ -84,41 +64,22 @@ def go(obj: callable, *args, callback: callable = None, lock: bool = False) -> N
              Normal function runs as thread.
         *args: Arguments for your obj.
                You can also use functools.partial() for your func.
-        callback: Attaches a callable that will be called when the future finishes.
-                  Use functools.partial() to your callback func.
-        lock: Thread safe if True. It can slow your program.
-              This argument only work for "func" not "coroutinefunction".
+        callback: Attaches a callable that will be called when the cor finishes.
     Return:
         None
     '''
     if callable(obj):
-        '''
-        Check if the given obeject callable.
-        '''
-        if _iscorfunc(obj):
+        # Check if the given obeject callable.
+        if _iscor(obj):
             # If a coroutinefunction run this.
-            future = asyncio.run_coroutine_threadsafe(obj(*args), _goroutine_loop)
-            if callback:
-                # Add callback func.
-                _finish(future, callback)
+            future = asyncio.run_coroutine_threadsafe(_wrap_cor(obj(*args), callback=callback),  _goroutine_loop)
         else:
-            # Normal func runs as a thread.
-            if lock:
-                # Thread safe. Only for a normal func.
-                cor = _wrap_as_cor_withlock(obj, *args)
-            else:
-                # Thread without lock.
-                cor = _wrap_as_cor(obj, *args)
-            future = asyncio.run_coroutine_threadsafe(cor, _goroutine_loop)
-            if callback:
-                _finish(future, callback)
+            # If normal func, runs as a thread.
+            future = asyncio.run_coroutine_threadsafe(_wrap_cor(_wrap_func(obj, *args), callback=callback), _goroutine_loop)
     else:
         raise TypeError(
             'A callable func or coroutinefunction object is required')
 
-
-# An asyncio-lock.
-_goroutine_loop_lock = asyncio.Lock()
 
 # Getting loop.
 _goroutine_loop = asyncio.new_event_loop()
@@ -126,4 +87,3 @@ _goroutine_loop = asyncio.new_event_loop()
 # Run the loop in a thread.
 T = Thread(target=_run, daemon=True)
 T.start()
-
