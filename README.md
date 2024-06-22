@@ -1,105 +1,101 @@
-English | [中文](https://github.com/purplegrapeZz/goroutine-py/blob/master/README-CN.md)
+English | 中文
 
-### goroutine-py
+goroutine-py
 
 🚀 An Asyncio-based concurrency library for Python.
 
-​	Easy concurrency just like goroutine without worry about thread and coroutine in Python.
+	Easy concurrency just like goroutine without worry about thread and coroutine in Python.
 
 
 
-# Introduction
+Introduction
 
-Withing  ``goroutine.app.go`` you can run a coroutine or a func asynchronously.
+Withing  goroutine.app.go you can run a coroutine or a func asynchronously.
 
-Main function ___go___ :
+Main function go :
 
-#####  go _(obj: callable, *args, callback: callable = None, lock: bool = False)_
+go (obj: callable, *args, callback: callable = None, lock: bool = False)
 
-​	___obj:___ Takes both callable coroutinefunction and func as object.
+	obj: Takes both callable coroutinefunction and func as object.
 
-​	___*args:___ Arguments for your obj.
+	*args: Arguments for your obj.
 
-​	___callback:___ Attaches a callable that will be called when the future finishes.
+	callback: Attaches a callable that will be called when the future finishes.
 
-​	___lock:___ Thread safe if True. It can slow your program.
 
-​		 This argument only work for "func" not "coroutinefunction".
 
-# Getting Started
-## Support:
+Getting Started
 
-	Python 3.7 / 3.8 / 3.9 / 3.10 / 3.11 / 3.12
+Support:
 
-## Installation
+    Python 3.7 / 3.8 / 3.9 / 3.10 / 3.11 / 3.12
+
+Installation
 
 First you have to install goroutine-py like this:
 
-```
-pip install goroutine-py
-```
+    pip install goroutine-py
 
-## Quick Tutorial
+Quick Tutorial
 
-The primary entity of goroutine-py is ``goroutine.app.go``.
+The primary entity of goroutine-py is goroutine.app.go.
+
 You can simply start using goroutine-py like this:
 
 First, define your tasks:
 
-```
-import asyncio
-import functools
-import time
-from goroutine.app import go
+    import asyncio
+    import time
+    from goroutine.app import go
+    
+    # A normal func
+    def task_1(n=2):
+        time.sleep(n)
+        print('Task_1_done')
+        return 'Result_1'
 
-# A normal func
-def task_1(n=2):
-    time.sleep(n)
-    print('Task_1_done')
-    return 'Result_1'
-```
+    # A coroutinefunction
+    async def task_2(n=1):
+        await asyncio.sleep(n)
+        print('Task_2_done')
+        return 'Result_2'
 
-```
-# A coroutinefunction
-async def task_2(n=1):
-    await asyncio.sleep(n)
-    print('Task_2_done')
-    return 'Result_2'
-```
+    # Callback func
+    def callback(result):
+        '''
+        Parameter "result" is the return from task.
+        Use functools.partial() to give arguments if you need more args at the beginning.
+        '''
+        print('-* callback *-')
+        print(result)
 
-```
-# Callback func
-def callback(future, arg=None):
-    '''
-    At least ONE Parameter "future" is required.
-    This future is a concurrent.futures.Future.
-    Use functools.partial() to give arguments for your callback func.
-    '''
-    print(future.result(),arg)
-```
 After you defined all your tasks and callback, you can go like this:
 
-```
-go(task_1)
-go(task_2)
-go(task_1, 4, callback=callback)
-go(task_2, 2, callback=functools.partial(callback,arg='a'))
-print('END')
-```
+    go(task_1)
+    go(task_2)
+    
+    # The "callback" parameter must be specified separately.
+    go(task_1, 5, callback = callback)
+    go(task_2, 3, callback = callback)
+    print('END')
+    
+    # Forever runing to show results.
+    while 1:
+        time.sleep(5)
 
 Output :
 
-```
->>>
-END
-Task_2_done
-Task_1_done
-Task_2_done
-Result_2 a
-Task_1_done
-Result_1 None
-```
+    >>>
+    END
+    Task_2_done
+    Task_1_done
+    Task_2_done
+    -* callback *-
+    Result_2
+    Task_1_done
+    -* callback *-
+    Result_1
 
-# License
+License
 
-This project is licensed under the MIT License - see the `LICENSE` file for details.
+This project is licensed under the MIT License - see the LICENSE file for details.
